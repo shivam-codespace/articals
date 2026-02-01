@@ -1,448 +1,209 @@
-# 👤 ADMIN USER SETUP GUIDE
+# Reactfolio V1.2 👩🏽‍🚀
 
-## 🎯 PROBLEM SOLVED
+Reactfolio is a modern and customizable personal portfolio web template built using the popular React library. It provides an easy way for developers, designers, and creatives to showcase their work, skills, and achievements in a professiona and visually appealing way. With its responsive design and clean code, Reactfolio can be easily tailored to suit individual needs and preferences, making it an ideal choice for anyone looking to create a stunning online portfolio.
 
-You now have **3 ways** to create the initial admin user with BCrypt-encrypted password!
+<center>
+<img src="https://cdn.tharindu.dev/reactfolio.jpg" alt="Reactfolio" />
+</center>
 
----
+Live demo here: <a href="https://reactfolio.tharindu.dev/" target="_blank">reactfolio.tharindu.dev</a>
 
-## ✅ SOLUTION 1: AUTOMATIC (RECOMMENDED)
+-   [Features](#-features)
+-   [Getting started](#-getting-started)
+-   [Installation and Setup Instructions](#-installation-and-setup-instructions)
+-   [Folder structure](#-folder-structure)
+-   [Configurations](#-configurations)
+-   [Google Analytics](#-google-analytics)
+-   [Building the React App](#-building-the-react-app)
+-   [FAQ](#-faq)
+-   [Contribution](#-contribution)
 
-### Auto-Create Admin on Startup
+## 📙 Features
 
-**What happens:**
-- When you start the application, it automatically checks if admin exists
-- If no admin found, it creates one with encrypted password
-- No manual work needed!
+-   📖 Multi-Page Layout
+    -   Home
+    -   About
+    -   Projects
+    -   Articles
+    -   Contact
+-   📱 Fully Responsive
+-   🛠 Easy configurations
 
-**How it works:**
-- File: `DataInitializer.java` (already created)
-- Runs automatically on application startup
-- Creates admin only if database is empty
+## 📚 Getting started
 
-**Steps:**
-1. Start your application:
-   ```bash
-   cd 01-Admin-Api
-   ./mvnw spring-boot:run
-   ```
+Clone down this repository. You will need `NodeJS` and `git` installed globally on your machine.
 
-2. Check console logs:
-   ```
-   ✅ Default admin user created successfully!
-   📧 Email: admin@ies.com
-   🔑 Password: Admin@123
-   ⚠️  Please change this password after first login!
-   ```
+## 🛠 Installation and Setup Instructions
 
-3. Login with these credentials:
-   - **Email:** `admin@ies.com`
-   - **Password:** `Admin@123`
+1. Installation: `npm install`
 
-**That's it!** ✅
+2. Run the project: `npm start`
 
----
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The page will reload if you make edits.
 
-## ✅ SOLUTION 2: REST API ENDPOINT
+## 📁 Folder structure
 
-### Create Admin via API Call
+-   `/public`: publicly accessible contents (ex: images, media).
+-   `/src`: all the components used in this project.
+    -   `/src/components/`: each reusable components of each pages.
+    -   `/src/data`: configurations of the web app.
+    -   `/src/pages`: pages that include in the web app.
 
-**Use this if:**
-- Application is already running
-- You want to create admin manually
-- Automatic creation didn't work
+## ⚙️ Configurations
 
-### Method 1: Using Postman
+Since this is a public and open source project, you can make any changes to it. If you are a ReactJS developer you can do it easily. But if you are a beginner, I have extracted the configurable data into a single directory, so you can edit the files in that directory to configure the entire web application.
 
-**Endpoint:** `POST http://localhost:9091/bootstrap/create-admin`
+Directory: `/src/data/`
 
-**Headers:**
-```
-Content-Type: application/json
-```
+-   `user.js`
 
-**No body needed!**
+    From this you can change the content of each page of the web application.
 
-**Success Response:**
-```json
-{
-  "status": "success",
-  "message": "Admin user created successfully",
-  "email": "admin@ies.com",
-  "password": "Admin@123",
-  "warning": "Please change this password after first login!"
-}
-```
+-   `articles.js`
 
-### Method 2: Using cURL
+    From this you can add your articles to the web application.
 
-```bash
-curl -X POST http://localhost:9091/bootstrap/create-admin \
-  -H "Content-Type: application/json"
-```
+    Instructions:
 
-### Method 3: Using Browser
+    -   Add new article
 
-Just open this URL in your browser:
-```
-http://localhost:9091/bootstrap/create-admin
-```
+        1. Create a new function starts with `article_`. For example you can add new function named `article_3`.
 
----
+        2. Then add the data accordingly.
 
-## ✅ SOLUTION 3: MANUAL SQL INSERT
+            - Add `<React.Fragment>` tag and it's closing tags in body.
+            - In React there has no keyword `class`, so you should use `className` to define html classes.
 
-### Create Admin via Database
+            ```js
+            function article_3() {
+            	return {
+            		date: "7 May 2023",
+            		title: "The Benefits of Cloud Computing",
+            		description: "Why businesses are turning to the cloud.",
+            		style: `
+            				.random-image {
+            					align-self: center;
+            					outline: 2px solid red;
+            				}
+            				`,
+            		body: (
+            			<React.Fragment>
+            				<div className="article-content">
+            					<div className="paragraph">
+            						Content of article 1
+            					</div>
+            					<img
+            						src="https://picsum.photos/200/300"
+            						alt="random"
+            						className="random-image"
+            					/>
+            				</div>
+            			</React.Fragment>
+            		),
+            	};
+            }
+            ```
 
-**Use this if:**
-- You want to insert directly into database
-- You need a custom admin user
-- Other methods don't work
+        3. In the last lines you will see an array to which you need to add your new `articles` function.
 
-### Step 1: Generate Encrypted Password
+            ```js
+            const myArticles = [article_1, article_2, article_3];
+            ```
 
-**Option A: Using API**
+-   `seo.js`
 
-**Endpoint:** `POST http://localhost:9091/bootstrap/encrypt-password`
+    The SEO.js file is a module that contains an array of objects, with each object representing metadata for a specific page of a React website. The purpose of this file is to centralize and manage the SEO (Search Engine Optimization) information for different pages.
 
-**Request Body:**
-```json
-{
-  "password": "YourPassword123"
-}
-```
+    Each object in the SEO array has the following properties:
 
-**Response:**
-```json
-{
-  "status": "success",
-  "plainPassword": "YourPassword123",
-  "encryptedPassword": "$2a$10$xyzABC123...",
-  "usage": "Use this encrypted password in SQL INSERT statement"
-}
-```
+    `page`: Represents the page name or identifier. It helps in mapping the SEO data to the appropriate page.
 
-**Option B: Using cURL**
+    `title`: Specifies the title of the page. This title is typically displayed in the browser's title bar and is an important element for search engines.
 
-```bash
-curl -X POST http://localhost:9091/bootstrap/encrypt-password \
-  -H "Content-Type: application/json" \
-  -d '{"password":"Admin@123"}'
-```
+    `description`: Provides a concise and informative description of the page content. This description is often displayed in search engine results and can greatly influence click-through rates.
+    keywords: Contains an array of keywords relevant to the page's content. Keywords can help search engines understand the topics covered on the page and can impact its visibility in search results.
+    By storing the SEO information in the SEO.js file, you can easily manage and update the metadata for different pages of your React website. This approach allows you to keep the SEO data separate from the components and reuse it across the application, ensuring consistent and optimized metadata for each page.
 
-### Step 2: Insert into Database
+    Example:
 
-Copy the `encryptedPassword` from response and use in SQL:
+    ```js
+    const SEO = [
+    	{
+    		page: "home",
+    		description:
+    			"I am a backend developer with expertise in Node.js. I have experience in building scalable, secure and reliable web applications using various frameworks and technologies.",
+    		keywords: ["Tharindu", "Tharindu N", "Tharindu Nayanajith"],
+    	},
+    ];
+    ```
 
-```sql
-INSERT INTO ies_users (
-    full_name, 
-    email, 
-    password, 
-    Mobile_No, 
-    gender, 
-    date_of_birth, 
-    SSN, 
-    active_status, 
-    active_switch, 
-    role_id
-) VALUES (
-    'System Administrator',
-    'admin@ies.com',
-    '$2a$10$xyzABC123...', -- Use encrypted password from API
-    9999999999,
-    'Male',
-    '1990-01-01',
-    999999999,
-    'UNLOCKED',
-    'Y',
-    1
-);
-```
+-   `styles.css`
 
----
+    From this you can change the font colors and font families of the web application.
 
-## 🔐 DEFAULT ADMIN CREDENTIALS
+    ```css
+    :root {
+    	/* ------- colors ------- */
+    	--primary-color: #27272a;
+    	--secondary-color: #65656d;
+    	--tertiary-color: #acacb4;
+    	--quaternary-color: #e4e4e7;
+    	--link-color: #14b8a6;
+    	/* ---------------------- */
 
-After using any method above:
+    	/* ------- fonts ------- */
+    	--primary-font: "Heebo", sans-serif;
+    	--secondary-font: "Roboto", sans-serif;
+    	/* --------------------- */
+    }
+    ```
 
-| Field | Value |
-|-------|-------|
-| **Email** | `admin@ies.com` |
-| **Password** | `Admin@123` |
-| **Role ID** | `1` (Admin) |
-| **Status** | `UNLOCKED` |
+## 📈 Google Analytics
 
----
+Add your Google Analytics 4 MEASUREMENT ID to `/src/data/tracking.js`.
 
-## 🧪 TESTING ADMIN LOGIN
+How to find the Google Analytics 4 MEASUREMENT ID ?
 
-### Using Postman
+[https://support.google.com/analytics/answer/9539598?hl=en](https://support.google.com/analytics/answer/9539598?hl=en)
 
-**Endpoint:** `POST http://localhost:9091/login`
+## 🚀 Building the React App
 
-**Request Body:**
-```json
-{
-  "email": "admin@ies.com",
-  "pwd": "Admin@123"
-}
-```
+To build the React app, you can use the `npm run build` command. This will create a production-ready build of your app in the `build/` directory.
 
-**Expected Response:**
-```json
-{
-  "status": "Success",
-  "email": "admin@ies.com",
-  "userId": 1,
-  "roleId": 1,
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+Here are the steps to follow:
 
-### Using cURL
+1. Open a terminal window and navigate to the root directory of your React app.
+2. Run the `npm run build` command to create a production build of your app. This will generate a static bundle of your app in the `build/` directory.
+3. Copy the contents of the `build/` directory to your server's public directory. You can do this using an FTP client or by running a command like `scp` to transfer the files to your server. Make sure to replace `example.com` and `/var/www/html` with your server's domain name and public directory, respectively:
 
-```bash
-curl -X POST http://localhost:9091/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@ies.com",
-    "pwd": "Admin@123"
-  }'
+    ```bash
+    scp -r build/* user@example.com:/var/www/html
+    ```
+
+4. Your portfolio app should now be accessible from your server's domain name. You can verify this by opening a web browser and navigating to http://example.com (replace example.com with your server's domain name).
+
+That's it! Your React portfolio app should now be up and running on your server. Note that you may need to configure your server's web server (e.g., Apache or Nginx) to serve the index.html file in the build/ directory as the default page for your domain.
+
+## 🤔 FAQ
+
+**Q1. Subpages can only be accessed through links on the homepage or navigation bar, but those pages are not accessible through direct links.**
+
+If you are using Apache as your web server, you can insert this into your .htaccess file:
+
+```c
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteRule . /index.html [L]
+</IfModule>
 ```
 
----
+## 🌱 Contribution
 
-## 🔧 BOOTSTRAP ENDPOINTS
-
-All bootstrap endpoints are **public** (no authentication required):
-
-### 1. Create Admin User
-```
-POST http://localhost:9091/bootstrap/create-admin
-```
-
-### 2. Encrypt Password
-```
-POST http://localhost:9091/bootstrap/encrypt-password
-Body: { "password": "YourPassword123" }
-```
-
-### 3. Health Check
-```
-GET http://localhost:9091/bootstrap/health
-```
-
----
-
-## 🎯 RECOMMENDED WORKFLOW
-
-### First Time Setup:
-
-1. **Start Application**
-   ```bash
-   cd 01-Admin-Api
-   ./mvnw spring-boot:run
-   ```
-
-2. **Check Logs**
-   - Look for: "✅ Default admin user created successfully!"
-   - If you see this, admin is ready!
-
-3. **Login**
-   - Email: `admin@ies.com`
-   - Password: `Admin@123`
-
-4. **Change Password** (Important!)
-   - After first login, create a new admin with secure password
-   - Or update the default admin password
-
-### If Auto-Creation Fails:
-
-1. **Use API Endpoint**
-   ```bash
-   curl -X POST http://localhost:9091/bootstrap/create-admin
-   ```
-
-2. **Verify**
-   ```bash
-   curl -X POST http://localhost:9091/login \
-     -H "Content-Type: application/json" \
-     -d '{"email":"admin@ies.com","pwd":"Admin@123"}'
-   ```
-
----
-
-## 🐛 TROUBLESHOOTING
-
-### Issue 1: "Admin user already exists"
-
-**Cause:** Admin already created
-
-**Solution:** Just login with existing credentials:
-- Email: `admin@ies.com`
-- Password: `Admin@123`
-
-If you forgot password, use password reset or manually update in database.
-
----
-
-### Issue 2: "BCrypt error" when inserting via SQL
-
-**Cause:** Password not encrypted
-
-**Solution:** 
-1. Use the encrypt-password endpoint to get BCrypt hash
-2. Use that hash in your SQL INSERT
-
-**Example:**
-```bash
-# Step 1: Get encrypted password
-curl -X POST http://localhost:9091/bootstrap/encrypt-password \
-  -H "Content-Type: application/json" \
-  -d '{"password":"Admin@123"}'
-
-# Step 2: Copy the encryptedPassword from response
-# Step 3: Use it in SQL INSERT
-```
-
----
-
-### Issue 3: "Cannot find bean PasswordEncoder"
-
-**Cause:** Application not started properly
-
-**Solution:**
-1. Clean and rebuild:
-   ```bash
-   mvn clean install
-   ```
-2. Restart application
-
----
-
-### Issue 4: Bootstrap endpoints return 404
-
-**Cause:** SecurityConfig not updated
-
-**Solution:** Already fixed! Bootstrap endpoints are now public.
-
----
-
-## 🔒 SECURITY NOTES
-
-### ⚠️ IMPORTANT: Production Security
-
-1. **Disable Bootstrap Endpoints in Production**
-   
-   Add to `application.yml`:
-   ```yaml
-   bootstrap:
-     enabled: false  # Set to false in production
-   ```
-
-2. **Change Default Password**
-   - Never use `Admin@123` in production
-   - Change immediately after first login
-
-3. **Remove DataInitializer**
-   - Comment out `@Component` annotation in production
-   - Or use profile-specific configuration
-
-4. **Secure Database**
-   - Don't expose database to public
-   - Use strong database passwords
-   - Enable SSL for database connections
-
----
-
-## 📊 VERIFICATION CHECKLIST
-
-After setup, verify:
-
-- [ ] Application starts without errors
-- [ ] Admin user exists in database
-- [ ] Password is BCrypt encrypted (starts with `$2a$` or `$2b$`)
-- [ ] Login works with admin credentials
-- [ ] JWT token is returned
-- [ ] Dashboard loads for admin user
-- [ ] Admin can create other users
-
----
-
-## 🎓 UNDERSTANDING BCRYPT
-
-### What is BCrypt?
-
-BCrypt is a password hashing function that:
-- Creates one-way encrypted passwords
-- Adds random salt for security
-- Makes brute-force attacks extremely difficult
-
-### BCrypt Password Format
-
-```
-$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
-│  │  │  └─────────────────────────────────────────────┘
-│  │  │                     Hash (31 chars)
-│  │  └─ Salt (22 chars)
-│  └─ Cost factor (10 = 2^10 iterations)
-└─ Algorithm version (2a)
-```
-
-### Why You Can't Just Copy Passwords
-
-❌ **This won't work:**
-```sql
--- Plain text password - LOGIN WILL FAIL!
-INSERT INTO ies_users (password) VALUES ('Admin@123');
-```
-
-✅ **This will work:**
-```sql
--- BCrypt encrypted password - LOGIN WILL SUCCEED!
-INSERT INTO ies_users (password) 
-VALUES ('$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
-```
-
----
-
-## 🚀 QUICK START COMMANDS
-
-### Option 1: Automatic (Just start app)
-```bash
-cd 01-Admin-Api
-./mvnw spring-boot:run
-# Admin created automatically!
-```
-
-### Option 2: API Endpoint
-```bash
-# Start app first, then:
-curl -X POST http://localhost:9091/bootstrap/create-admin
-```
-
-### Option 3: Get Encrypted Password
-```bash
-curl -X POST http://localhost:9091/bootstrap/encrypt-password \
-  -H "Content-Type: application/json" \
-  -d '{"password":"Admin@123"}'
-# Copy encrypted password and use in SQL
-```
-
----
-
-## ✅ SUCCESS!
-
-If you can login with `admin@ies.com` / `Admin@123` and get a JWT token, you're all set! 🎉
-
-**Next Steps:**
-1. Test all endpoints with admin token
-2. Create additional users
-3. Create plans
-4. Test complete workflow
-
----
-
-**Need help?** Check the troubleshooting section above or review the logs!
-
+If you have any suggestions on what to improve in Reactfolio and would like to share them, feel free to leave an issue or fork project to implement your own ideas
