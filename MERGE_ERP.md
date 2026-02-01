@@ -1,7 +1,4 @@
-Here’s a **clean, professional `README.md` version** of your SRS, properly formatted for **GitHub / portfolio projects** 👌
-You can directly copy-paste this into `README.md`.
-
----
+ 
 
 # MERGE ERP
 
