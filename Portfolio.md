@@ -340,6 +340,88 @@ MCA (2026) | Java Backend Developer
 Spring Boot • MongoDB • React  
 
 ---
+## 🔗 GitHub Repository
 
-⭐ If you like this project, consider giving it a star!
+```md
+### Source Code Repository
+
+The complete source code for this project is available on GitHub.  
+It includes frontend (React), backend (Spring Boot), database configuration, and documentation.
+
+🔗 GitHub(Frontend) Link: https://github.com/shivam-codespace/Personal-Portfolio.git
+🔗 GitHub(Backend) Link: https://github.com/shivam-codespace/articals-service.git
+```
+
+---
+
+## 📁 Project Code Availability
+
+```md
+### Project Code
+
+All modules of the Integrated Eligibility System (IES) Application are maintained in a public GitHub repository.  
+The repository contains:
+- Backend source code (Spring Boot)
+- Frontend source code (React)
+- Database scripts
+- API documentation
+- README and project documentation
+
+# Repository URL:
+
+🔗 GitHub(Frontend) Link: https://github.com/shivam-codespace/Personal-Portfolio.git
+🔗 GitHub(Backend) Link: https://github.com/shivam-codespace/articals-service.git
+
+---
+
+## 👨‍💻 Developer & Repository Information
+
+```md
+### Developer Information
+
+**Developer:** Shivam Sharma  
+**Degree:** MCA (Batch 2026)  
+**University:** MMMUT, Gorakhpur  
+
+The project is developed and maintained using GitHub for version control.
+
+🔗 GitHub(Frontend) Link: https://github.com/shivam-codespace/Personal-Portfolio.git
+🔗 GitHub(Backend) Link: https://github.com/shivam-codespace/articals-service.git
+```
+
+---
+
+## 🚀 How to Access the Project
+
+```md
+### Accessing the Project Source Code
+
+To explore or run this project locally, visit the GitHub repository using the link below:
+
+🔗 GitHub(Frontend) Link: https://github.com/shivam-codespace/Personal-Portfolio.git
+🔗 GitHub(Backend) Link: https://github.com/shivam-codespace/articals-service.git
+
+Clone the repository:
+```
+
+```bash
+git clone https://github.com/shivam-codespace/articals-service.git
+
+git clone https://github.com/shivam-codespace/Personal-Portfolio.git
+```
+
+---
+
+## 📌 Reference Section Entry (For Report / README)
+
+```md
+### References
+
+- Project Source Code Repository: 
+🔗 GitHub(Frontend) Link: https://github.com/shivam-codespace/Personal-Portfolio.git
+🔗 GitHub(Backend) Link: https://github.com/shivam-codespace/articals-service.git
+```
+
+---
+
  

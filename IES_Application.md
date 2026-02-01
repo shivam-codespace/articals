@@ -283,6 +283,7 @@ Eligibility Approved
 
 ---
 
+
 ## 🧠 Backend Flow (Detailed Explanation)
 
 The backend of the IES Application follows a **layered Spring Boot architecture**, ensuring separation of concerns, scalability, and maintainability.
@@ -640,4 +641,82 @@ It modernizes welfare administration through automation, centralized data manage
 * Government Welfare Scheme Guidelines
 * E-Governance Research Papers
 
+
+## 🔗 GitHub Repository
+
+```md
+### Source Code Repository
+
+The complete source code for this project is available on GitHub.  
+It includes frontend (React), backend (Spring Boot), database configuration, and documentation.
+
+🔗 GitHub Link: https://github.com/shivam-codespace/ies_application_backend.git
+```
+
+---
+
+## 📁 Project Code Availability
+
+```md
+### Project Code
+
+All modules of the Integrated Eligibility System (IES) Application are maintained in a public GitHub repository.  
+The repository contains:
+- Backend source code (Spring Boot)
+- Frontend source code (React)
+- Database scripts
+- API documentation
+- README and project documentation
+
+🔗 Repository URL: https://github.com/shivam-codespace/ies_application_backend.git
+
+---
+
+## 👨‍💻 Developer & Repository Information
+
+```md
+### Developer Information
+
+**Developer:** Shivam Sharma  
+**Degree:** MCA (Batch 2026)  
+**University:** MMMUT, Gorakhpur  
+
+The project is developed and maintained using GitHub for version control.
+
+🔗 GitHub Repository: https://github.com/shivam-codespace/ies_application_backend.git
+```
+
+---
+
+## 🚀 How to Access the Project
+
+```md
+### Accessing the Project Source Code
+
+To explore or run this project locally, visit the GitHub repository using the link below:
+
+🔗 https://github.com/shivam-codespace/ies_application_backend.git
+
+Clone the repository:
+```
+
+```bash
+git clone https://github.com/shivam-codespace/ies_application_backend.git
+```
+
+---
+
+## 📌 Reference Section Entry (For Report / README)
+
+```md
+### References
+
+- Project Source Code Repository: https://github.com/shivam-codespace/ies_application_backend.git
+```
+
+---
+
  
+
+ 
+
