@@ -6,6 +6,12 @@ The **Integrated Eligibility System (IES)** is a centralized, intranet-based web
 It automates eligibility determination, reduces manual effort, ensures data consistency, and improves transparency in public welfare administration.
 
 ---
+## Source Code
+
+The complete source code for this project is available on GitHub:
+
+👉 [https://github.com/shivam-codespace/ies_application_backend.git](https://github.com/shivam-codespace/ies_application_backend.git)
+
 
 ## 📌 Problem Statement
 

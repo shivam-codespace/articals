@@ -9,6 +9,12 @@ The application allows managing articles stored in MongoDB while dynamically fet
 This project is designed to demonstrate **real-world backend flow, clean API design, and modern frontend rendering**.
 
 ---
+## Source Code
+
+The complete source code for this project is available on GitHub:
+
+👉 [https://github.com/shivam-codespace/Personal-Portfolio.git](https://github.com/shivam-codespace/Personal-Portfolio.git)
+
 
 ## 🧠 Project Overview
 

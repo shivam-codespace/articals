@@ -4,9 +4,12 @@
 
 **Cloud-Based School Management System**
 
-![Version](https://img.shields.io/badge/version-1.0-blue)
-![Type](https://img.shields.io/badge/type-Web%20Application-green)
-![Status](https://img.shields.io/badge/status-Active-success)
+## Source Code
+
+The complete source code for this project is available on GitHub:
+
+👉 [https://github.com/shivam-codespace/MERGE-ERP.git](https://github.com/shivam-codespace/MERGE-ERP.git)
+
 
 ---
 
