@@ -1,209 +1,643 @@
-# Reactfolio V1.2 👩🏽‍🚀
+ 
 
-Reactfolio is a modern and customizable personal portfolio web template built using the popular React library. It provides an easy way for developers, designers, and creatives to showcase their work, skills, and achievements in a professiona and visually appealing way. With its responsive design and clean code, Reactfolio can be easily tailored to suit individual needs and preferences, making it an ideal choice for anyone looking to create a stunning online portfolio.
+# 🏛 Integrated Eligibility System (IES Application)
 
-<center>
-<img src="https://cdn.tharindu.dev/reactfolio.jpg" alt="Reactfolio" />
-</center>
+The **Integrated Eligibility System (IES)** is a centralized, intranet-based web application designed to manage and evaluate citizen eligibility for multiple government welfare schemes.
+It automates eligibility determination, reduces manual effort, ensures data consistency, and improves transparency in public welfare administration.
 
-Live demo here: <a href="https://reactfolio.tharindu.dev/" target="_blank">reactfolio.tharindu.dev</a>
+---
 
--   [Features](#-features)
--   [Getting started](#-getting-started)
--   [Installation and Setup Instructions](#-installation-and-setup-instructions)
--   [Folder structure](#-folder-structure)
--   [Configurations](#-configurations)
--   [Google Analytics](#-google-analytics)
--   [Building the React App](#-building-the-react-app)
--   [FAQ](#-faq)
--   [Contribution](#-contribution)
+## 📌 Problem Statement
 
-## 📙 Features
+Government welfare schemes often operate in isolation with manual processes and separate databases.
+This results in:
 
--   📖 Multi-Page Layout
-    -   Home
-    -   About
-    -   Projects
-    -   Articles
-    -   Contact
--   📱 Fully Responsive
--   🛠 Easy configurations
+* Data redundancy
+* Inconsistent eligibility decisions
+* Delayed approvals
+* Lack of transparency
+* Increased human error
 
-## 📚 Getting started
+A **unified, rule-driven system** is required to centralize citizen data, automate eligibility checks, and streamline employee workflows.
 
-Clone down this repository. You will need `NodeJS` and `git` installed globally on your machine.
+---
 
-## 🛠 Installation and Setup Instructions
+## 🎯 Objectives
 
-1. Installation: `npm install`
+### Primary Objectives
 
-2. Run the project: `npm start`
+* Centralized management of multiple welfare schemes
+* Automated eligibility determination using predefined rules
+* Secure handling of citizen data
+* Reduction in manual paperwork
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-The page will reload if you make edits.
+### Secondary Objectives
 
-## 📁 Folder structure
+* Email-based approval/denial notifications
+* Dashboards and reports for employees
+* Audit-ready historical data storage
+* Scalable architecture for future schemes
 
--   `/public`: publicly accessible contents (ex: images, media).
--   `/src`: all the components used in this project.
-    -   `/src/components/`: each reusable components of each pages.
-    -   `/src/data`: configurations of the web app.
-    -   `/src/pages`: pages that include in the web app.
+---
 
-## ⚙️ Configurations
+## 🧩 Scope of the Project
 
-Since this is a public and open source project, you can make any changes to it. If you are a ReactJS developer you can do it easily. But if you are a beginner, I have extracted the configurable data into a single directory, so you can edit the files in that directory to configure the entire web application.
+* Intranet-based application (office use only)
+* Access restricted to authenticated IES employees
+* Citizens apply through physical office visits
+* Supports multiple welfare schemes:
 
-Directory: `/src/data/`
+  * Life Insurance Scheme
+  * Senior Citizen Pension
+  * Ration Card Scheme
+  * Ayushman Bharat
+  * Unemployment Assistance
+* Easily extendable for new schemes
 
--   `user.js`
+🚫 *Out of scope:* citizen self-service portal, external government DB integration (future scope)
 
-    From this you can change the content of each page of the web application.
+---
 
--   `articles.js`
+## 🏗 System Architecture
 
-    From this you can add your articles to the web application.
+### 🔹 High-Level Architecture (Textual Diagram)
 
-    Instructions:
+```
++--------------------------------------------------+
+|                IES APPLICATION                   |
++--------------------------------------------------+
 
-    -   Add new article
-
-        1. Create a new function starts with `article_`. For example you can add new function named `article_3`.
-
-        2. Then add the data accordingly.
-
-            - Add `<React.Fragment>` tag and it's closing tags in body.
-            - In React there has no keyword `class`, so you should use `className` to define html classes.
-
-            ```js
-            function article_3() {
-            	return {
-            		date: "7 May 2023",
-            		title: "The Benefits of Cloud Computing",
-            		description: "Why businesses are turning to the cloud.",
-            		style: `
-            				.random-image {
-            					align-self: center;
-            					outline: 2px solid red;
-            				}
-            				`,
-            		body: (
-            			<React.Fragment>
-            				<div className="article-content">
-            					<div className="paragraph">
-            						Content of article 1
-            					</div>
-            					<img
-            						src="https://picsum.photos/200/300"
-            						alt="random"
-            						className="random-image"
-            					/>
-            				</div>
-            			</React.Fragment>
-            		),
-            	};
-            }
-            ```
-
-        3. In the last lines you will see an array to which you need to add your new `articles` function.
-
-            ```js
-            const myArticles = [article_1, article_2, article_3];
-            ```
-
--   `seo.js`
-
-    The SEO.js file is a module that contains an array of objects, with each object representing metadata for a specific page of a React website. The purpose of this file is to centralize and manage the SEO (Search Engine Optimization) information for different pages.
-
-    Each object in the SEO array has the following properties:
-
-    `page`: Represents the page name or identifier. It helps in mapping the SEO data to the appropriate page.
-
-    `title`: Specifies the title of the page. This title is typically displayed in the browser's title bar and is an important element for search engines.
-
-    `description`: Provides a concise and informative description of the page content. This description is often displayed in search engine results and can greatly influence click-through rates.
-    keywords: Contains an array of keywords relevant to the page's content. Keywords can help search engines understand the topics covered on the page and can impact its visibility in search results.
-    By storing the SEO information in the SEO.js file, you can easily manage and update the metadata for different pages of your React website. This approach allows you to keep the SEO data separate from the components and reuse it across the application, ensuring consistent and optimized metadata for each page.
-
-    Example:
-
-    ```js
-    const SEO = [
-    	{
-    		page: "home",
-    		description:
-    			"I am a backend developer with expertise in Node.js. I have experience in building scalable, secure and reliable web applications using various frameworks and technologies.",
-    		keywords: ["Tharindu", "Tharindu N", "Tharindu Nayanajith"],
-    	},
-    ];
-    ```
-
--   `styles.css`
-
-    From this you can change the font colors and font families of the web application.
-
-    ```css
-    :root {
-    	/* ------- colors ------- */
-    	--primary-color: #27272a;
-    	--secondary-color: #65656d;
-    	--tertiary-color: #acacb4;
-    	--quaternary-color: #e4e4e7;
-    	--link-color: #14b8a6;
-    	/* ---------------------- */
-
-    	/* ------- fonts ------- */
-    	--primary-font: "Heebo", sans-serif;
-    	--secondary-font: "Roboto", sans-serif;
-    	/* --------------------- */
-    }
-    ```
-
-## 📈 Google Analytics
-
-Add your Google Analytics 4 MEASUREMENT ID to `/src/data/tracking.js`.
-
-How to find the Google Analytics 4 MEASUREMENT ID ?
-
-[https://support.google.com/analytics/answer/9539598?hl=en](https://support.google.com/analytics/answer/9539598?hl=en)
-
-## 🚀 Building the React App
-
-To build the React app, you can use the `npm run build` command. This will create a production-ready build of your app in the `build/` directory.
-
-Here are the steps to follow:
-
-1. Open a terminal window and navigate to the root directory of your React app.
-2. Run the `npm run build` command to create a production build of your app. This will generate a static bundle of your app in the `build/` directory.
-3. Copy the contents of the `build/` directory to your server's public directory. You can do this using an FTP client or by running a command like `scp` to transfer the files to your server. Make sure to replace `example.com` and `/var/www/html` with your server's domain name and public directory, respectively:
-
-    ```bash
-    scp -r build/* user@example.com:/var/www/html
-    ```
-
-4. Your portfolio app should now be accessible from your server's domain name. You can verify this by opening a web browser and navigating to http://example.com (replace example.com with your server's domain name).
-
-That's it! Your React portfolio app should now be up and running on your server. Note that you may need to configure your server's web server (e.g., Apache or Nginx) to serve the index.html file in the build/ directory as the default page for your domain.
-
-## 🤔 FAQ
-
-**Q1. Subpages can only be accessed through links on the homepage or navigation bar, but those pages are not accessible through direct links.**
-
-If you are using Apache as your web server, you can insert this into your .htaccess file:
-
-```c
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-l
-  RewriteRule . /index.html [L]
-</IfModule>
+        Secure Intranet Network
+                   |
+                   v
++----------------------------------+
+|     Frontend (React + Tailwind)  |
+|----------------------------------|
+| - Admin Dashboard                |
+| - Employee Dashboard             |
+| - Forms & Reports                |
++---------------+------------------+
+                |
+                | REST APIs (JSON)
+                v
++--------------------------------------------------+
+|             Spring Boot Backend                  |
+|--------------------------------------------------|
+| Controller Layer                                 |
+|  - Auth Controller                               |
+|  - Application Controller                        |
+|  - Eligibility Controller                        |
+|  - Report Controller                             |
+|                                                  |
+| Service Layer                                    |
+|  - User Management Service                       |
+|  - Data Collection Service                       |
+|  - Eligibility Determination Service              |
+|  - Correspondence (Email) Service                |
+|                                                  |
+| Repository Layer                                 |
+|  - User Repository                               |
+|  - Citizen Repository                            |
+|  - Plan Repository                               |
+|  - Application Repository                        |
++----------------------+---------------------------+
+                       |
+                       | JPA / Hibernate
+                       v
++--------------------------------------------------+
+|                MySQL Database                   |
+|--------------------------------------------------|
+| - Users                                          |
+| - Citizens                                       |
+| - Applications                                   |
+| - Plans                                          |
+| - Eligibility Results                            |
+| - Notices & Logs                                 |
++--------------------------------------------------+
+                       |
+                       v
++--------------------------------------------------+
+| External Services                                |
+|--------------------------------------------------|
+| - SMTP (Email Notifications)                     |
+| - SSA Web API (SSN Validation)                   |
++--------------------------------------------------+
 ```
 
-## 🌱 Contribution
+---
 
-If you have any suggestions on what to improve in Reactfolio and would like to share them, feel free to leave an issue or fork project to implement your own ideas
+## 🔧 Technology Stack
+
+### Frontend
+
+* React.js
+* JavaScript (ES6)
+* HTML5
+* Tailwind CSS
+
+### Backend
+
+* Java
+* Spring Boot
+* Spring MVC
+* Spring Security
+* Spring Data JPA
+
+### Database
+
+* MySQL
+
+### Tools & Utilities
+
+* Git & GitHub
+* Postman
+* Swagger (API Docs)
+* VS Code
+* Spring Tool Suite (STS)
+* SLF4J (Logging)
+
+---
+
+## 🧠 System Modules
+
+1. **Admin Module**
+
+   * Create & manage employees
+   * Manage welfare plans
+
+2. **User Management**
+
+   * Login / Logout
+   * Profile management
+   * Password recovery
+
+3. **Application Registration (AR)**
+
+   * Citizen registration
+   * SSN verification (SSA API)
+   * Application creation
+
+4. **Data Collection (DC)**
+
+   * Personal details
+   * Family, education, employment
+   * Income & kids details
+
+5. **Eligibility Determination (ED)**
+
+   * Rule-based eligibility checks
+   * Approval / Denial logic
+
+6. **Correspondence (CO)**
+
+   * Email notices:
+
+     * Approval
+     * Denial
+     * Missing documents
+     * Termination
+
+7. **Benefit Issuance**
+
+   * Approved benefit tracking
+
+8. **Reports Module**
+
+   * Approved/Denied statistics
+   * Audit logs
+
+---
+
+## 🔄 Workflow of the System
+
+```
+Employee Login
+      |
+      v
+Citizen Application Registration
+      |
+      |-- SSN Verification
+      |
+      v
+Data Collection
+      |
+      |-- Personal / Family / Income Data
+      |
+      v
+Plan Selection
+      |
+      v
+Eligibility Determination
+      |
+   +--+-------------+
+   |                |
+Approved          Denied
+   |                |
+   v                v
+Benefit Issuance   Denial Notice
+        |
+        v
+Email Notification
+        |
+        v
+Reports & Audit Logs
+```
+
+---
+
+## 🧮 Eligibility Decision Flow
+
+```
+Start
+  |
+  v
+Check Age?
+  |
+  +-- No --> Denied
+  |
+Check Income?
+  |
+  +-- No --> Denied
+  |
+Check Employment?
+  |
+  +-- No --> Denied
+  |
+Check Family Rules?
+  |
+  +-- No --> Denied
+  |
+Eligibility Approved
+```
+
+---
+
+
+## 🔐 Security Features
+
+* Role-based access control (Admin / Employee)
+* Encrypted passwords
+* Input validation
+* Restricted intranet access
+* Secure session management
+
+---
+
+## 🧠 Backend Flow (Detailed Explanation)
+
+The backend of the IES Application follows a **layered Spring Boot architecture**, ensuring separation of concerns, scalability, and maintainability.
+
+### 🔁 Backend Request Lifecycle (Textual Figure)
+
+```
+HTTP Request
+    |
+    v
+@RestController
+    |
+    v
+@Service Layer
+    |
+    |-- Business Rules
+    |-- Eligibility Logic
+    |
+    v
+@Repository Layer
+    |
+    v
+MySQL Database
+    |
+    v
+Response DTO
+    |
+    v
+Frontend (React)
+```
+
+### Layer Responsibilities
+
+* **Controller Layer**
+
+  * Exposes REST APIs
+  * Handles request validation
+  * Sends responses using DTOs
+* **Service Layer**
+
+  * Core business logic
+  * Eligibility rule execution
+  * Email triggering
+* **Repository Layer**
+
+  * Database interaction using Spring Data JPA
+  * CRUD operations
+* **Utility Layer**
+
+  * Email templates
+  * Date & validation helpers
+  * Logging helpers
+
+---
+
+## 📂 Database Design Overview
+
+### Key Entities
+
+```
+User
+ ├── id
+ ├── username
+ ├── role
+ └── status
+
+Citizen
+ ├── citizenId
+ ├── name
+ ├── ssn
+ ├── dob
+ └── address
+
+Application
+ ├── applicationId
+ ├── citizenId
+ ├── planId
+ └── status
+
+Plan
+ ├── planId
+ ├── planName
+ ├── eligibilityRules
+ └── benefitAmount
+
+EligibilityResult
+ ├── resultId
+ ├── applicationId
+ ├── status
+ └── reason
+```
+
+### Relationship Diagram (Textual)
+
+```
+User (Admin/Employee)
+        |
+        v
+     Application
+        |
+        v
+     Citizen ----> Plan
+        |
+        v
+EligibilityResult
+```
+
+---
+
+## ⚙ Eligibility Rule Engine (Conceptual Design)
+
+Eligibility determination is implemented using **conditional rule evaluation** based on scheme criteria.
+
+### Rule Evaluation Logic
+
+```
+IF age >= requiredAge
+AND income <= incomeLimit
+AND employmentStatus == allowed
+AND familyConditions satisfied
+THEN
+   APPROVE
+ELSE
+   DENY
+```
+
+### Why Rule-Based Engine?
+
+* Easy to modify policies
+* No hard-coded logic in UI
+* Supports new schemes without code rewrite
+* Improves accuracy & consistency
+
+---
+
+## ✉ Correspondence Module – Email Workflow
+
+### Email Flow
+
+```
+Eligibility Decision
+        |
+        v
+Generate Email Template
+        |
+        v
+Populate Dynamic Data
+        |
+        v
+SMTP Mail Server
+        |
+        v
+Citizen Receives Email
+```
+
+### Types of Notices
+
+* ✅ Approval Notice
+* ❌ Denial Notice
+* ⚠ Missing Documents
+* 🔁 Renewal Reminder
+* ⛔ Termination Notice
+
+---
+
+## 🧾 Logging & Monitoring Strategy
+
+The system uses **SLF4J logging** for traceability and debugging.
+
+### Log Levels Used
+
+* `INFO` – Business flow events
+* `DEBUG` – Eligibility logic & data flow
+* `WARN` – Deletions & abnormal actions
+* `ERROR` – Failures & exceptions
+
+### Sample Log Flow
+
+```
+INFO  User logged in successfully
+INFO  Application created for citizen ID 1023
+DEBUG Eligibility check started
+INFO  Eligibility approved
+INFO  Email notification sent
+```
+
+---
+
+## 🔐 Security Design (In-Depth)
+
+### Authentication
+
+* Username & password login
+* Password encryption
+* First-time user account unlock
+
+### Authorization
+
+* Admin vs Employee roles
+* Restricted access to sensitive modules
+
+### Data Protection
+
+* Input validation
+* Controlled intranet access
+* Secure REST APIs
+
+---
+
+## 🖥 Frontend Architecture (React)
+
+### Component Structure
+
+```
+src/
+ ├── components/
+ │    ├── common/
+ │    ├── admin/
+ │    ├── user/
+ ├── pages/
+ │    ├── Login
+ │    ├── Dashboard
+ │    ├── Registration
+ ├── services/
+ │    ├── api.js
+ ├── utils/
+ └── App.jsx
+```
+
+### Frontend Responsibilities
+
+* Form validation
+* Role-based UI rendering
+* API communication
+* Error handling
+* Responsive layout
+
+---
+
+## 📊 Reports & Analytics
+
+The reporting module enables administrators to:
+
+* View approved vs denied statistics
+* Track scheme-wise distribution
+* Export data for audits
+* Monitor employee productivity
+
+### Report Generation Flow
+
+```
+Admin Request
+    |
+    v
+Report Service
+    |
+    v
+Database Query
+    |
+    v
+Formatted Output (Table / PDF)
+```
+
+---
+
+## 🧪 Quality Assurance Strategy
+
+### Testing Pyramid
+
+```
+UI Testing
+---------
+Integration Testing
+---------
+Unit Testing
+```
+
+* **JUnit** for backend unit tests
+* **Mocking** for service isolation
+* **Postman** for API testing
+
+---
+
+## 📌 Why This Project is Industry-Relevant
+
+* Real-world **e-Governance use case**
+* Enterprise-grade **Spring Boot architecture**
+* Secure, scalable design
+* Strong database modeling
+* Rule-based decision system
+* Production-ready logging & testing
+
+---
+ 
+
+## 🧠 Suggested README Badges (Optional)
+
+```md
+![Java](https://img.shields.io/badge/Java-SpringBoot-green)
+![React](https://img.shields.io/badge/Frontend-React-blue)
+![MySQL](https://img.shields.io/badge/Database-MySQL-orange)
+![Status](https://img.shields.io/badge/Project-Completed-success)
+```
+
+ 
+ 
+## 🧪 Testing
+
+* Unit Testing (JUnit)
+* Integration Testing
+* API Testing (Postman)
+* UI Testing
+
+### Sample Test Case
+
+| Test Case | Description      | Input             | Expected Output | Result |
+| --------- | ---------------- | ----------------- | --------------- | ------ |
+| TC01      | Login            | Valid credentials | Dashboard loads | Pass   |
+| TC02      | Register Citizen | Valid details     | Data saved      | Pass   |
+
+---
+
+## 📈 Results
+
+* Faster application processing
+* Accurate eligibility evaluation
+* Centralized citizen records
+* Improved transparency
+* Reduced human error
+
+---
+
+## 🚀 Future Enhancements
+
+* Online citizen portal
+* Aadhaar / National ID integration
+* Mobile application
+* Multilingual support
+* External government DB integration
+
+ 
+
+## ✅ Conclusion
+
+The **Integrated Eligibility System** provides a scalable, secure, and efficient solution for managing government welfare schemes.
+It modernizes welfare administration through automation, centralized data management, and transparent eligibility determination.
+
+ 
+
+## 📚 References
+
+* Spring Boot Documentation
+* ReactJS Documentation
+* MySQL Documentation
+* Government Welfare Scheme Guidelines
+* E-Governance Research Papers
+
+ 
