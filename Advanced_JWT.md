@@ -180,24 +180,35 @@ public class AuthenticationRequest implements Serializable {
 ### `AuthenticationResponse.java`
 
 ```java
-package in.maddy.models;
+ 
+package in.maddy.entities;
 
 import java.io.Serializable;
 
-public class AuthenticationResponse implements Serializable {
+public class AuthenticationResponse implements Serializable{
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
+	
+	private final String accessToken;
+    private final String refreshToken;
 
-    private final String jwt;
-
-    public AuthenticationResponse(String jwt) {
-        this.jwt = jwt;
+    public AuthenticationResponse(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
-    public String getJwt() {
-        return jwt;
-    }
+	public String getAccessToken() {
+		return accessToken;
+	}
+
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
+	 
 }
+
+
 ```
 
 ---
@@ -207,8 +218,12 @@ public class AuthenticationResponse implements Serializable {
 ### `HelloRequestController.java`
 
 ```java
+ 
 package in.maddy.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -217,17 +232,22 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-import in.maddy.models.AuthenticationRequest;
-import in.maddy.models.AuthenticationResponse;
+import in.maddy.entities.AuthenticationRequest;
+import in.maddy.entities.AuthenticationResponse;
 import in.maddy.utils.JwtUtils;
+
+ 
 
 @RestController
 public class HelloRequestController {
 
+    private static final Logger logger = LoggerFactory.getLogger(HelloRequestController.class);
+
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
-
+    
+    // ✅ Constructor Injection (Best Practice)
     public HelloRequestController(AuthenticationManager authenticationManager,
                                   UserDetailsService userDetailsService,
                                   JwtUtils jwtUtils) {
@@ -238,6 +258,7 @@ public class HelloRequestController {
 
     @GetMapping("/hello")
     public String firstPage() {
+        logger.info("Accessed /hello endpoint");
         return "Hello World";
     }
 
@@ -245,22 +266,62 @@ public class HelloRequestController {
     public ResponseEntity<?> createAuthenticationToken(
             @RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 
+        logger.info("Authentication attempt for user: {}", authenticationRequest.getUsername());
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             authenticationRequest.getUsername(),
-                            authenticationRequest.getPassword()));
+                            authenticationRequest.getPassword()
+                    )
+            );
+            logger.info("Authentication successful for user: {}", authenticationRequest.getUsername());
         } catch (BadCredentialsException e) {
-            throw new Exception("Incorrect username or password", e);
+            logger.error("Authentication failed for user: {}", authenticationRequest.getUsername(), e);
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid username or password");
         }
 
-        UserDetails userDetails = userDetailsService
-                .loadUserByUsername(authenticationRequest.getUsername());
+        // ✅ Load user properly
+        UserDetails userDetails =
+                userDetailsService.loadUserByUsername(
+                        authenticationRequest.getUsername()
+                );
+        logger.debug("Loaded user details: {}", userDetails.getUsername());
 
-        String jwt = jwtUtils.generateToken(userDetails.getUsername());
-        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+        // ✅ Generate JWT
+        String accessToken = jwtUtils.generateAccessToken(userDetails);
+        String refreshToken = jwtUtils.generateRefreshToken(userDetails);
+        logger.info("JWT generated for user: {}", userDetails.getUsername());
+
+        return ResponseEntity.ok(new AuthenticationResponse(accessToken, refreshToken));
     }
+  
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestParam String refreshToken) {
+
+    	 try {
+             String username = jwtUtils.extractUsername(refreshToken);
+             UserDetails user =
+                     userDetailsService.loadUserByUsername(username);
+
+             String newAccessToken =
+                     jwtUtils.generateAccessToken(user);
+
+             return ResponseEntity.ok(newAccessToken);
+
+         } catch (Exception ex) {
+             logger.error("Invalid refresh token", ex);
+             return ResponseEntity
+                     .status(HttpStatus.UNAUTHORIZED)
+                     .body("Invalid refresh token");
+         }
+    }
+
 }
+
+
 ```
 
 ---
@@ -270,24 +331,57 @@ public class HelloRequestController {
 ### `MyUserDetailsService.java`
 
 ```java
-package in.maddy.security;
+package in.maddy.service;
+ 
+import java.util.List;
 
-import java.util.ArrayList;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(MyUserDetailsService.class);
+
+    private final PasswordEncoder passwordEncoder;
+
+    public MyUserDetailsService(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new User("admin", "admin@123", new ArrayList<>());
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+
+        logger.info("Authenticating user: {}", username);
+
+        if (!"admin".equals(username)) {
+            logger.warn("Authentication failed. User not found: {}", username);
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return User.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("admin@123")) // BCrypt
+                .authorities(List.of(
+                        new SimpleGrantedAuthority("ROLE_ADMIN")
+                ))
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .disabled(false)
+                .build();
     }
 }
+
 ```
 
 ---
@@ -310,62 +404,222 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import in.maddy.filters.JwtRequestFilter;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@SuppressWarnings("deprecation")
 public class WebSecurityConfig {
 
-    @Autowired
-    private JwtRequestFilter jwtRequestFilter;
 
     @Autowired
-    private UserDetailsService myUserDetailsService;
+    private AuthenticationEntryPoint authenticationEntryPoint;
 
+    // ---------------- SECURITY FILTER CHAIN ----------------
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,JwtRequestFilter jwtRequestFilter,UserDetailsService userDetailsService) throws Exception {
 
         http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/authenticate").permitAll()
-                .anyRequest().authenticated())
+            .exceptionHandling(ex ->
+                ex.authenticationEntryPoint(authenticationEntryPoint)
+            )
             .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authenticationProvider(authenticationProvider())
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/authenticate",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            .authenticationProvider(authenticationProvider(userDetailsService))
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    // ---------------- AUTH MANAGER ----------------
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    // ---------------- AUTH PROVIDER ----------------
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(myUserDetailsService);
+    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
 
+    // ---------------- PASSWORD ENCODER ----------------
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance(); // ✅ REQUIRED
+        return new BCryptPasswordEncoder(); // ✅ ENTERPRISE STANDARD
+    }
+
+    // ---------------- CORS CONFIG ----------------
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:8080"));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 }
+
 ```
 
+---
+
+### `JwtKeyConfig.java`
+
+```java
+package in.maddy.security;
+
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+
+ 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+ 
+
+@Configuration
+public class JwtKeyConfig {
+
+    @Bean
+    public KeyPair keyPair() throws Exception {
+
+        String publicKeyPem = Files.readString(
+                Path.of("src/main/resources/keys/public_key.pem")
+        );
+
+        String privateKeyPem = Files.readString(
+                Path.of("src/main/resources/keys/private_key.pem")
+        );
+
+        publicKeyPem = publicKeyPem
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s", "");
+
+        privateKeyPem = privateKeyPem
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+        PublicKey publicKey = keyFactory.generatePublic(
+                new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyPem))
+        );
+
+        PrivateKey privateKey = keyFactory.generatePrivate(
+                new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyPem))
+        );
+
+        return new KeyPair(publicKey, privateKey);
+    }
+}
+
+```
+---
+### `JwtAuthenticationEntryPoint.java`
+
+```java
+package in.maddy.security;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+
+@Component
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    @Override
+    public void commence(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException authException
+    ) throws IOException, ServletException {
+
+        response.sendError(
+                HttpServletResponse.SC_UNAUTHORIZED,
+                "Unauthorized: JWT token is missing or invalid"
+        );
+    }
+}
+
+```
+---
+### `GlobalExceptionhandler.java`
+
+```java
+package in.maddy.security;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import io.jsonwebtoken.JwtException;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+	 @ExceptionHandler(BadCredentialsException.class)
+	    public ResponseEntity<String> handleBadCredentials() {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .body("Invalid username or password");
+	    }
+
+	    @ExceptionHandler(JwtException.class)
+	    public ResponseEntity<String> handleJwtError() {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .body("Invalid or expired JWT");
+	    }
+}
+
+```
 ---
 ## 🔐 Jwt Utils Configuration
 
@@ -374,74 +628,87 @@ public class WebSecurityConfig {
 ```java
 package in.maddy.utils;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
+import java.security.KeyPair;
+import java.security.PublicKey;
 import java.util.Date;
 
+ 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.*;
 
 @Service
 public class JwtUtils {
 
-    // 🔐 256-bit secret key (minimum for HS256)
-    private static final String SECRET_KEY =
-            "mysecretkeymysecretkeymysecretkey";
-
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(
-                SECRET_KEY.getBytes(StandardCharsets.UTF_8)
-        );
+    private static final String ISSUER = "ashokit-auth-server";
+    private static final String AUDIENCE = "ashokit-api";
+    private static final long ACCESS_TOKEN_EXP  = 15 * 60 * 1000; // 15 min
+    private static final long REFRESH_TOKEN_EXP = 7 * 24 * 60 * 60 * 1000;
+    
+    
+    private final KeyPair keyPair;
+    
+    public JwtUtils(KeyPair keyPair) {
+        this.keyPair = keyPair;
+    }
+    
+    public String generateAccessToken(UserDetails userDetails) {
+        return generateToken(userDetails, ACCESS_TOKEN_EXP,"ACCESS");
     }
 
-    // ✅ Extract username from token
-    public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
+    public String generateRefreshToken(UserDetails userDetails) {
+        return generateToken(userDetails, REFRESH_TOKEN_EXP,"REFRESH");
     }
 
-    // ✅ Extract expiry date
-    public Date extractExpiration(String token) {
-        return extractAllClaims(token).getExpiration();
-    }
-
-    // ✅ Parse token
-    private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
-    // ✅ Generate JWT token
-    public String generateToken(String username) {
+    // ----------------- GENERATE TOKEN -----------------
+    public String generateToken(UserDetails userDetails, long expiry,String tokenType) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(userDetails.getUsername()) // no PII
+                .setIssuer(ISSUER)
+                .setAudience(AUDIENCE)
                 .setIssuedAt(new Date())
-                .setExpiration(
-                        new Date(System.currentTimeMillis() + 1000 * 60 * 60)
-                ) // 1 hour validity
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + expiry))
+                .signWith(keyPair.getPrivate(), SignatureAlgorithm.RS256)
                 .compact();
     }
 
-    // ✅ Validate token
-    public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername())
-                && !isTokenExpired(token);
+    // ----------------- VALIDATE TOKEN -----------------
+    public Claims validateAndParseToken(String token) {
+
+        JwtParser parser = Jwts.parserBuilder()
+                .requireIssuer(ISSUER)
+                .requireAudience(AUDIENCE)
+                .setSigningKey(getPublicKey())
+                .build();
+
+        Jws<Claims> jws = parser.parseClaimsJws(token);
+
+        // Explicit algorithm validation
+        String alg = jws.getHeader().getAlgorithm();
+        if (!SignatureAlgorithm.RS256.getValue().equals(alg)) {
+            throw new JwtException("Invalid signing algorithm");
+        }
+
+        return jws.getBody();
     }
 
-    // ✅ Check expiry
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    public String extractUsername(String token) {
+        return validateAndParseToken(token).getSubject();
+    }
+
+    private PublicKey getPublicKey() {
+        return keyPair.getPublic();
+    }
+    
+    public boolean isRefreshToken(String token) {
+        return "REFRESH".equals(
+                validateAndParseToken(token).get("type")
+        );
     }
 }
+
+
 ```
 
 ---
@@ -450,14 +717,14 @@ public class JwtUtils {
 ### `Dependencies`
 
 ```xml
-<dependencies>
+	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 
 		<dependency>
@@ -471,6 +738,7 @@ public class JwtUtils {
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
 		<dependency>
 		    <groupId>io.jsonwebtoken</groupId>
 		    <artifactId>jjwt-api</artifactId>
@@ -490,22 +758,78 @@ public class JwtUtils {
 		    <version>0.11.5</version>
 		    <scope>runtime</scope>
 		</dependency>
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
 
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
+			<artifactId>spring-boot-starter-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 ```
 
 ---
+
+## 📂 Folder Structure
+
+```
+51_SB_MS_Security_JWT_Advance/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── in/
+│   │   │       └── maddy/
+│   │   │           ├── Application.java
+│   │   │           ├── ServletInitializer.java
+│   │   │           ├── entities/
+│   │   │           │   ├── AuthenticationRequest.java
+│   │   │           │   └── AuthenticationResponse.java
+│   │   │           ├── filters/
+│   │   │           │   └── JwtRequestFilter.java
+│   │   │           ├── rest/
+│   │   │           │   └── HelloRequestController.java
+│   │   │           ├── security/
+│   │   │           │   ├── GlobalExceptionHandler.java
+│   │   │           │   ├── JwtAuthenticationEntryPoint.java
+│   │   │           │   ├── JwtKeyConfig.java
+│   │   │           │   └── WebSecurityConfig.java
+│   │   │           ├── service/
+│   │   │           │   └── MyUserDetailsService.java
+│   │   │           └── utils/
+│   │   │               └── JwtUtils.java
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── keys/
+│   │       │   ├── private_key.pem
+│   │       │   └── public_key.pem
+│   │       ├── static/
+│   │       └── templates/
+│   └── test/
+│       └── java/
+├── target/
+│   ├── generated-sources/
+│   │   └── annotations/
+│   └── generated-test-sources/
+│       └── test-annotations/
+├── HELP.md
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+├── JRE System Library [JavaSE-17]
+└── Maven Dependencies
+```
+
+---
+
 ### 1️⃣ Application Bootstrap
 
 **`Application.java`**
