@@ -829,513 +829,240 @@ public class JwtUtils {
 ```
 
 ---
+ 
+---
 
-### 1️⃣ Application Bootstrap
+## 🚀 Application Bootstrap
 
-**`Application.java`**
+### `Application.java`
+Main entry point for Spring Boot.
 
-* Entry point of the Spring Boot application
-* Uses `@SpringBootApplication` to enable:
-
-  * Auto-configuration
-  * Component scanning
-  * Spring Boot setup
-
-**`ServletInitializer.java`**
-
-* Extends `SpringBootServletInitializer`
-* Allows deployment as a **WAR file** on external servers (Tomcat, etc.)
-* Important for production-ready apps
+### `ServletInitializer.java`
+Enables deployment as a **WAR** to external servlet containers like **Tomcat**.
 
 ---
 
-### 2️⃣ JWT Authentication Flow (High Level)
+## 🔐 Security Components Explained
 
-```
-Client → /authenticate → JWT generated
-Client → sends JWT in Authorization header
-JWT Filter → validates token
-Security Context → authenticated user
-Protected APIs → accessible
-```
+### 1️⃣ JwtRequestFilter
+- Runs **once per request**
+- Extracts JWT from `Authorization` header
+- Validates token
+- Sets authenticated user in `SecurityContext`
 
----
+### 2️⃣ WebSecurityConfig
+- Configures:
+  - Stateless session policy
+  - JWT filter chain
+  - Authentication provider
+  - Password encoding (BCrypt)
+  - CORS
+  - Endpoint authorization rules
 
-### 3️⃣ JWT Filter Layer
+### 3️⃣ JwtUtils
+- Generates **Access & Refresh tokens**
+- Validates JWT using **RSA public key**
+- Enforces:
+  - Issuer
+  - Audience
+  - Expiry
+  - Algorithm (RS256)
 
-**`JwtRequestFilter`**
-
-* Runs **once per request**
-* Responsibilities:
-
-  * Read `Authorization` header
-  * Extract JWT (`Bearer <token>`)
-  * Extract username from token
-  * Validate token
-  * Set authentication in `SecurityContextHolder`
-
-✔ Best practices used:
-
-* `OncePerRequestFilter`
-* Avoids re-authentication if context already exists
-* Uses `UsernamePasswordAuthenticationToken` correctly
-
----
-
-### 4️⃣ Authentication Models
-
-**`AuthenticationRequest`**
-
-* Accepts:
-
-  * `username`
-  * `password`
-* Used in `/authenticate` API
-
-**`AuthenticationResponse`**
-
-* Returns:
-
-  * `jwt` token
-* Immutable response object (good design)
+### 4️⃣ JwtKeyConfig
+- Loads RSA keys from `.pem` files
+- Creates a reusable `KeyPair` bean
 
 ---
 
-### 5️⃣ REST Controller
+## 👤 User Authentication
 
-**`HelloRequestController`**
-
-Endpoints:
-
-* `GET /hello`
-
-  * Protected API
-  * Requires valid JWT
-* `POST /authenticate`
-
-  * Public API
-  * Validates credentials
-  * Generates JWT
-
-Flow inside `/authenticate`:
-
-1. Authenticate using `AuthenticationManager`
-2. Load user via `UserDetailsService`
-3. Generate JWT
-4. Return token to client
+### `MyUserDetailsService`
+- Implements `UserDetailsService`
+- Loads users (currently in-memory)
+- Uses **BCrypt password hashing**
+- Supports **role-based authorization**
 
 ---
 
-### 6️⃣ User Details Service
+## 🌐 REST APIs
 
-**`MyUserDetailsService`**
+### 🔓 Public Endpoints
 
-* Implements `UserDetailsService`
-* Currently returns **in-memory static user**:
+| Method | Endpoint | Description |
+|------|---------|-------------|
+| POST | `/authenticate` | Login & generate JWT |
+| POST | `/refresh` | Generate new access token |
 
-  ```
-  username: admin
-  password: admin@123
-  ```
+### 🔐 Secured Endpoints
 
-📌 This is perfect for:
-
-* Learning
-* Demos
-* POCs
-
-(In real projects → DB-based users)
+| Method | Endpoint | Description |
+|------|---------|-------------|
+| GET | `/hello` | Requires valid JWT |
 
 ---
 
-### 7️⃣ Spring Security Configuration
+## 🧾 JWT Token Details
 
-**`WebSecurityConfig`**
-
-Key configurations:
-
-* ❌ CSRF disabled (required for stateless JWT)
-* ✅ `/authenticate` → public
-* 🔒 All other endpoints → secured
-* 🚫 Session creation disabled (STATELESS)
-* 🔑 Custom JWT filter added
-* 🔐 DAO Authentication Provider used
-
-Password Encoding:
-
-* `NoOpPasswordEncoder`
-
-  * Used for simplicity
-  * ⚠️ Not recommended for production
+- **Algorithm:** RS256
+- **Access Token Expiry:** 15 minutes
+- **Refresh Token Expiry:** 7 days
+- **Claims:**
+  - `sub` → username
+  - `iss` → issuer
+  - `aud` → audience
 
 ---
 
-### 8️⃣ JWT Utility Class
+## 🚨 Exception Handling
 
-**`JwtUtils`**
-
-Responsibilities:
-
-* Generate JWT token
-* Validate JWT token
-* Extract:
-
-  * Username
-  * Expiration
-* Uses:
-
-  * HS256 algorithm
-  * 256-bit secret key
-  * 1-hour expiration
-
-✔ Proper use of `io.jsonwebtoken (jjwt)` library
+- `JwtAuthenticationEntryPoint`
+  - Handles unauthorized access (401)
+- `GlobalExceptionHandler`
+  - Handles:
+    - Invalid credentials
+    - Expired or malformed JWTs
 
 ---
 
-## 📘 README.md (Based on Your Code)
+## 🔐 Dependencies
 
-You can **directly copy-paste** this into `README.md` 👇
+Key dependencies used:
 
----
-
-```md
-# 🔐 Spring Boot JWT Authentication Application
-
-## 📌 Project Overview
-This project demonstrates a **stateless authentication system** using **Spring Boot, Spring Security, and JWT (JSON Web Tokens)**.  
-It secures REST APIs by validating JWT tokens on every request without using server-side sessions.
+- Spring Boot Web & Security
+- Spring Validation
+- JJWT (JWT creation & validation)
+- BCrypt Password Encoder
+- Spring Security Test
 
 ---
 
-## 🚀 Features
-- JWT-based authentication
-- Stateless security (no HTTP session)
-- Custom JWT filter
-- Secure API access using Spring Security
-- Clean and modular architecture
-- Ready for REST API integration
+## 🧪 Testing Ready
+
+The project includes:
+- `spring-security-test`
+- `spring-webmvc-test`
+
+Easily extensible for:
+- Controller tests
+- Filter tests
+- Authentication tests
 
 ---
 
-## 🛠️ Tech Stack
-- Java
-- Spring Boot
-- Spring Security
-- JWT (jjwt library)
-- Maven
+## 📈 Enterprise Improvements (Next Steps)
+
+To make this **100% enterprise-ready**:
+- 🔄 Token revocation (Redis)
+- 👥 Role & permission-based APIs
+- 🧾 Audit logging
+- 📜 Swagger/OpenAPI docs
+- 🧪 Full test coverage
+- 🔐 Secrets management (Vault / KMS)
 
 ---
 
-## 🔄 Authentication Flow
-1. Client sends credentials to `/authenticate`
-2. Server validates username & password
-3. JWT token is generated
-4. Client sends JWT in `Authorization` header
-5. JWT filter validates token
-6. Access is granted to protected APIs
+**This project is ~90% industry-standard.**
+
+That’s a **very strong score**, especially for an individual project.
 
 ---
 
-## 📂 Package Structure
-```
+## ✅ Why it’s already ~90% 🔥
 
-in.maddy
-├── filters
-│   └── JwtRequestFilter.java
-├── models
-│   ├── AuthenticationRequest.java
-│   └── AuthenticationResponse.java
-├── rest
-│   └── HelloRequestController.java
-├── security
-│   ├── MyUserDetailsService.java
-│   └── WebSecurityConfig.java
-├── utils
-│   └── JwtUtils.java
-├── Application.java
-└── ServletInitializer.java
+You’ve covered almost everything companies expect in a **real backend authentication system**.
 
-````
+### 🏗️ Architecture & Security (Strong)
 
----
+- Stateless JWT authentication ✔️  
+- RSA (RS256) signing with public/private keys ✔️  
+- Custom `OncePerRequestFilter` ✔️  
+- Proper `SecurityContext` population ✔️  
+- `AuthenticationEntryPoint` for 401 handling ✔️  
+- Centralized `@RestControllerAdvice` ✔️  
+- BCrypt password encoding ✔️  
+- Constructor injection ✔️  
+- WAR deployable (`ServletInitializer`) ✔️  
 
-## 🔐 API Endpoints
+### 🧹 Code Quality (Professional)
 
-### 1️⃣ Authenticate User
-**POST** `/authenticate`
+- Clean package separation ✔️  
+- Logging via SLF4J ✔️  
+- No hardcoded secrets in code ✔️  
+- Explicit JWT algorithm validation ✔️  
+- Refresh token support ✔️  
 
-**Request Body**
-```json
-{
-  "username": "admin",
-  "password": "admin@123"
-}
-````
+### 🔐 Spring Security Usage (Correct)
 
-**Response**
+- `SecurityFilterChain` (modern Spring Security approach) ✔️  
+- Stateless session policy ✔️  
+- Custom authentication provider ✔️  
+- Correct filter ordering ✔️  
 
-```json
-{
-  "jwt": "eyJhbGciOiJIUzI1NiJ9..."
-}
-```
+➡️ This already puts you **ahead of many working developers**.
 
 ---
 
-### 2️⃣ Protected API
+## ❗ What’s Missing for 100% (Last 10%)
 
-**GET** `/hello`
+These are **enterprise scaling concerns**, not fundamentals.
 
-**Header**
+### 🔻 1. Token Revocation / Logout (3%)
 
-```
-Authorization: Bearer <JWT_TOKEN>
-```
+- No blacklist or revoke mechanism  
+- Industry typically uses **Redis / DB-backed token invalidation**
 
-**Response**
+### 🔻 2. Refresh Token Hardening (2%)
 
-```
-Hello World
-```
+Refresh tokens are not yet:
+- Stored server-side  
+- Rotated on every use  
+- Strictly validated for token type  
+  (`type=REFRESH` exists but is not enforced in the flow)
 
----
+### 🔻 3. Externalized Key Management (2%)
 
-## 👤 Default User (In-Memory)
+- Keys are loaded from the filesystem  
+- Enterprises typically use:
+  - AWS KMS  
+  - Azure Key Vault  
+  - HashiCorp Vault  
 
-```
-Username: admin
-Password: admin@123
-```
+### 🔻 4. Audit & Security Logging (1%)
 
----
+- No login attempt tracking  
+- No failed authentication monitoring  
 
-## ⚙️ Security Configuration
+### 🔻 5. Tests & Documentation (2%)
 
-* CSRF disabled
-* Stateless session policy
-* Custom JWT filter
-* DAO authentication provider
-* NoOp password encoder (for demo purposes)
-
----
-
-## ⏳ Token Details
-
-* Algorithm: HS256
-* Expiration Time: 1 Hour
-* Secret Key: 256-bit key
+- No integration tests shown  
+- No Swagger / OpenAPI configuration  
 
 ---
 
-## ⚠️ Notes
+## 🧮 Final Industry Rating
 
-* Password encoder is `NoOpPasswordEncoder` (not for production)
-* User data is in-memory
-* Can be easily extended with database authentication
+| Level       | Meaning                    |
+|------------|----------------------------|
+| 60%        | Tutorial-level             |
+| 70%        | Fresher / Intern           |
+| 80%        | Junior Backend Developer   |
+| **90%**    | **Mid–Senior Backend Dev** |
+| 95–100%    | Staff Engineer / Architect |
 
----
-
-### 1️⃣ Architecture Diagram (BIG IMPACT)
-
-Clients & reviewers **love visuals**.
-
-```md
-## 🧱 System Architecture
-
-Client
-  ↓ (Credentials)
-Authentication API
-  ↓ (JWT)
-JWT Filter
-  ↓
-Spring Security Context
-  ↓
-Protected REST APIs
-```
-
-Or you can add an image later:
-
-```md
-![JWT Architecture](docs/jwt-architecture.png)
-```
+👉 **You’re solidly in the 90% zone.**
 
 ---
 
-### 2️⃣ Sequence Flow (Interview Gold ⭐)
-
-Shows you *understand* what’s happening internally.
-
-```md
-## 🔄 Request Lifecycle
-
-1. Client sends login request to `/authenticate`
-2. AuthenticationManager validates credentials
-3. JWT token is generated
-4. Token is returned to client
-5. Client sends token with each request
-6. JwtRequestFilter validates token
-7. SecurityContext is populated
-8. Protected API is executed
-```
-
----
-
-### 3️⃣ Security Design Decisions (Very Professional)
-
-This screams **“real backend developer”**.
-
-```md
-## 🔐 Security Design Decisions
-
-- JWT used to ensure stateless authentication
-- CSRF disabled due to REST-based stateless APIs
-- Sessions disabled to improve scalability
-- Custom filter used for token validation
-- Authentication context stored per request
-```
-
----
-
-### 4️⃣ Error Handling Section
-
-Even simple projects look senior with this.
-
-```md
-## ❌ Error Handling
-
-- Invalid credentials → 401 Unauthorized
-- Missing token → 403 Forbidden
-- Expired token → Access denied
-- Malformed token → Authentication failure
-```
-
----
-
-### 5️⃣ How to Run Locally (Must-Have for GitHub)
-
-This is almost mandatory.
-
-````md
-## ▶️ Run Project Locally
-
-1. Clone the repository
-```bash
-git clone https://github.com/your-username/jwt-auth-app.git
-````
-
-2. Navigate to project
-
-```bash
-cd jwt-auth-app
-```
-
-3. Run the application
-
-```bash
-mvn spring-boot:run
-```
-
-4. Application runs at:
-
-```
-http://localhost:8080
-```
-
-````
-
----
-
-### 6️⃣ Testing with Postman / Curl (Client Friendly)
-Shows practical usage.
-
-```md
-## 🧪 API Testing
-
-Use Postman or curl:
-
-```bash
-curl -X POST http://localhost:8080/authenticate \
--H "Content-Type: application/json" \
--d '{"username":"admin","password":"admin@123"}'
-````
-
-````
-
----
-
-### 7️⃣ Limitations (Honesty = Trust)
-Very underrated but powerful.
-
-```md
-## ⚠️ Limitations
-
-- In-memory authentication only
-- No password encryption
-- No refresh token mechanism
-- No role-based authorization
-````
-
----
-
-### 8️⃣ Production Readiness Checklist ✅
-
-This is 🔥 for interviews.
-
-```md
-## 🚀 Production Readiness Checklist
-
-- [ ] Replace NoOpPasswordEncoder with BCrypt
-- [ ] Move users to database
-- [ ] Externalize JWT secret
-- [ ] Add refresh tokens
-- [ ] Enable HTTPS
-- [ ] Add logging & monitoring
-```
-
----
-
-### 9️⃣ API Contract Summary
-
-Makes it feel enterprise-level.
-
-```md
-## 📄 API Contract
-
-| Method | Endpoint        | Access  | Description              |
-|------|----------------|--------|--------------------------|
-| POST | /authenticate  | Public | Generate JWT token       |
-| GET  | /hello         | Secure | Sample protected API     |
-```
-
----
-
-### 🔑 My Top 5 (If You Add Only a Few)
-
-If you want **maximum impact with minimum effort**, add these:
-
-1. Architecture Diagram
-2. Request Lifecycle
-3. How to Run Locally
-4. Production Readiness Checklist
-5. Security Design Decisions
-
----
-
-## 📈 Future Enhancements
-
-* Database-backed users (JPA + MySQL)
-* Refresh token support
-* Role-based authorization
-* Password encryption (BCrypt)
-* Global exception handling
-
----
+ 
 
 ## 👨‍💻 Author
 
-**Shivam Sharma**
-Java | Spring Boot | Backend Developer
+**Shivam Sharma**  
+Spring Boot | Security | Backend Engineering  
 
+---
+
+ 
 ```
 
  
